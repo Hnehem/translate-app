@@ -1,0 +1,24 @@
+import { LanguageDetector, FilesetResolver } from "@mediapipe/tasks-text";
+
+let detectorInstance;
+
+const createLanguageDetector = async () => {
+    const text = await FilesetResolver.forTextTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@latest/wasm');
+
+
+    detectorInstance = await LanguageDetector.createFromOptions(text, {
+        baseOptions: {
+            modelAssetPath: 'src/shared/models/language_detector.tflite',
+        },
+        maxResults: 1,
+    });
+
+    return detectorInstance;
+}
+
+export const languageDetect = async (text) => {
+    const languageDetector = await createLanguageDetector();
+    const results = languageDetector.detect(text);
+
+    return results;
+}

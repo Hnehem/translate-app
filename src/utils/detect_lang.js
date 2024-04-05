@@ -4,11 +4,11 @@ let detectorInstance;
 
 const createLanguageDetector = async () => {
     const text = await FilesetResolver.forTextTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@latest/wasm');
-
-
+    let modelPath = import.meta.env.MODE === 'production' ? import.meta.env.VITE_APP_MODEL_PATH : import.meta.env.VITE_REACT_APP_MODEL_PATH 
+    console.log(modelPath);
     detectorInstance = await LanguageDetector.createFromOptions(text, {
         baseOptions: {
-            modelAssetPath: 'src/shared/models/language_detector.tflite',
+            modelAssetPath: `${modelPath}`,
         },
         maxResults: 1,
     });

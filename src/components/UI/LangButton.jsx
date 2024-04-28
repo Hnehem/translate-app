@@ -1,16 +1,16 @@
-import { forwardRef, useContext } from "react";
-import { AppContext } from "../state/translate_app_context";
+import { useContext } from "react";
+import { AppContext } from "../../state/translate_app_context";
 
-const LangButton = forwardRef(({name, children, className, roll, ...props }, ref) => {
+export default function LangButton ({name, children, className, input = false, ...props }) {
   const { inputLang, outputLang, updateLang } = useContext(AppContext);
 
-  const language = roll === 'input' ? inputLang : outputLang;
+  const language = input || name === 'detect' ? inputLang : outputLang;
+  const roll = input || name === 'detect' ? 'input' : 'output';
 
   let selected = language == name;
   
   return (
       <button
-        ref={ref}
         type="button"
         name={name}
         className={`btn--lang ${className && className} ${selected && 'selected'}`}
@@ -20,6 +20,4 @@ const LangButton = forwardRef(({name, children, className, roll, ...props }, ref
         {children}
       </button>
   );
-});
-
-export default LangButton;
+};

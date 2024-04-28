@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { AppContext } from "../state/translate_app_context";
-import { fetchTranslation } from "../utils/fetch_translation";
+import { AppContext } from "../../state/translate_app_context";
+import { fetchTranslation } from "../../utils/fetch_translation";
 
-export default function Icon({ roll, name, route, title }) {
+export default function Icon({ name, route, title, input = false}) {
   const {
     inputLang,
     outputLang,
@@ -12,8 +12,8 @@ export default function Icon({ roll, name, route, title }) {
     updateTranslationInfo,
   } = useContext(AppContext);
 
-  let text = roll === "input" ? inputedText : translatedText;
-  let language = roll === "input" ? inputLang : outputLang;
+  let text = input ? inputedText : translatedText;
+  let language = input ? inputLang : outputLang;
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = language;

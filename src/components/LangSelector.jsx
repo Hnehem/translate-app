@@ -1,15 +1,15 @@
 import DropDownButton from "./DropDownButton";
-import LangButton from "./LangButton";
+import LangButton from "./UI/LangButton";
 
-export default function LangNavBar({ roll }) {
+export default function LangSelector({ input = false }) {
   return (
     <div>
-      {roll === "input" && (
-        <LangButton  roll='input' name="detect">Detect Language</LangButton>
+      {input && (
+        <LangButton name="detect" input >Detect Language</LangButton>
       )}
-      <LangButton roll={roll} name="en">English</LangButton>
-      <LangButton roll={roll} name="fr">French</LangButton>
-      <DropDownButton roll={roll} name="es" />
+      <LangButton input={input} name="en">English</LangButton>
+      <LangButton input={input} name="fr">French</LangButton>
+      <DropDownButton input={input} name="es" />
     </div>
   );
 }

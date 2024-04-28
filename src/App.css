@@ -59,6 +59,10 @@
   background-color: rgba(0, 0, 20, 0.3);
 }
 
+.drop--wrapper {
+  display: inline-block;
+}
+
 .drop--down--btn {
   position: relative;
   display: inline-flex;
@@ -88,8 +92,6 @@
   border: 1px solid #4d5562;
   border-top: none;
   border-radius: .3rem;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
 }
 
 .drop--down--content {

@@ -76,3 +76,7 @@ export const AVAILABLE_LANGS = [
       iso: "vi",
     },
   ];
+
+  export function isLangAvailable(lang) {
+    return AVAILABLE_LANGS.some((elem) => Object.values(elem).includes(lang));
+  }

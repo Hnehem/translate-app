@@ -1,120 +1,91 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
+import { useInLangChange } from "../hooks/useInLangChange.js";
+import { useClickOutside } from "../hooks/useClickOutside.js";
 import dropDownIcon from "../assets/svg/Expand_down.svg";
-import DropDownLangMenu from "./DropDownLangSelector.jsx";
-import LangButton from "./LangButton.jsx";
+import DropDownLangMenu from "./DropDownLangMenu.jsx";
+import LangButton from "./UI/LangButton.jsx";
 import { AppContext } from "../state/translate_app_context.jsx";
-import { AVAILABLE_LANGS } from "../utils/langs.js";
+import { AVAILABLE_LANGS, isLangAvailable } from "../utils/langs.js";
 
-export default function DropDownButton({ name, roll }) {
+export default function DropDownButton({ name, input = false }) {
   const { inputLang, outputLang, updateLang, updateTranslationInfo } =
     useContext(AppContext);
 
-  let language = roll === "input" ? inputLang : outputLang;
-  if (!AVAILABLE_LANGS.some((elem) => Object.values(elem).includes(language)))
-    language = name;
+  let language = input ? inputLang : outputLang;
+  if (!isLangAvailable(language)) language = name;
 
   const [displayMenu, setDisplayMenu] = useState(false);
   const [buttonIso, setButtonIso] = useState(language);
   const menuRef = useRef();
 
-  useEffect(() => {
-    function handleOutsiderClick(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setDisplayMenu(false);
-      }
-    }
-    document.addEventListener("mousedown", handleOutsiderClick);
+  useClickOutside(menuRef, () => {
+    setDisplayMenu(false);
+  });
 
-    return () => {
-      document.removeEventListener("mousedown", handleOutsiderClick);
-    };
-  }, []);
+  //dropDownButton display on language detection, switch languages and language selection...
+  useInLangChange(input, buttonIso, inputLang, () => {
+    setButtonIso(inputLang);
+  });
 
-  //input or output language update on buttonIso state change...
-  useEffect(() => {
-    if (
-      buttonIso !== name &&
-      AVAILABLE_LANGS.some((elem) => Object.values(elem).includes(inputLang))
-    ) {
-      updateLang(buttonIso, roll);
-    } else if (
-      // buttonIso !== name &&
-      AVAILABLE_LANGS.some((elem) => Object.values(elem).includes(outputLang))
-    ) {
-      updateLang(buttonIso, roll);
-    }
-  }, [buttonIso]);
+  //dropDownButton display on switch languages and language selection...
+  useInLangChange(!input, buttonIso, outputLang, () => {
+    setButtonIso(outputLang);
+  });
 
-  useEffect(() => {
-    //in case detected language is not supported...
-    let langs = [
-      ...AVAILABLE_LANGS.map((elem) => elem.iso),
-      "fr",
-      "es",
-      "en",
-      "detect",
-    ].includes(inputLang);
-    if (!langs) {
-      updateLang("en", "output");
-      updateLang("detect", "input");
-      updateTranslationInfo(
-        "The language you are looking for is not suported!",
-        true
-      );
-    }
+  //in case detected language is not supported...
+  let langs = [
+    ...AVAILABLE_LANGS.map((elem) => elem.iso),
+    "fr",
+    "es",
+    "en",
+    "detect",
+  ].includes(inputLang);
 
-    //dropDownButton display on language detection...
-    if (roll === "input" && inputLang !== buttonIso) {
-      if (
-        AVAILABLE_LANGS.some((elem) => Object.values(elem).includes(inputLang))
-      ) {
-        setButtonIso(inputLang);
-      }
-    }
-  }, [inputLang]);
-
-  //dropDownButton display on switch languages...
-  useEffect(() => {
-    if (roll === "output" && outputLang !== buttonIso) {
-      if (
-        AVAILABLE_LANGS.some((elem) => Object.values(elem).includes(outputLang))
-      ) {
-        setButtonIso(outputLang);
-      }
-    }
-  }, [outputLang]);
+  useInLangChange(!langs, null, inputLang, () => {
+    updateLang("en", "output");
+    updateLang("detect", "input");
+    updateTranslationInfo(
+      "The language you are looking for is not suported!",
+      true
+    );
+  });
 
   function handleMenuDisplay() {
     setDisplayMenu(!displayMenu);
   }
 
-  function handleButtonValue(iso) {
-    setButtonIso(iso);
+  function handleButtonValue() {
     setDisplayMenu(!displayMenu);
   }
 
   return (
-    <LangButton
-      roll={roll}
-      ref={menuRef}
-      name={buttonIso}
-      className={`drop--down--btn`}
-    >
-      <span>
-        {AVAILABLE_LANGS.map((elem) => {
-          if (elem.iso === buttonIso) {
-            return elem.lang;
-          }
-        })}
-      </span>
-      <img
-        title="Select another language."
-        className="drop"
-        src={dropDownIcon}
-        alt="Drop down icon"
-        onClick={handleMenuDisplay}
-      />
-      {displayMenu && <DropDownLangMenu onSelect={handleButtonValue} />}
-    </LangButton>
+    <div className="drop--wrapper" ref={menuRef}>
+      <LangButton
+        input={input}
+        name={buttonIso}
+        className={`drop--down--btn`}
+      >
+        <span>
+          {AVAILABLE_LANGS.map((elem) => {
+            if (elem.iso === buttonIso) {
+              return elem.lang;
+            }
+          })}
+        </span>
+        <img
+          title="Select another language."
+          className="drop"
+          src={dropDownIcon}
+          alt="Drop down icon"
+          onClick={handleMenuDisplay}
+        />
+        {displayMenu && (
+          <DropDownLangMenu
+            onSelect={handleButtonValue}
+            input={input}
+          />
+        )}
+      </LangButton>
+    </div>
   );
 }

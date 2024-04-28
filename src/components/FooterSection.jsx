@@ -1,13 +1,13 @@
 import translateIcon from "../assets/svg/Sort_alfa.svg";
 import hear from "../assets/svg/sound_max_fill.svg";
 import copy from "../assets/svg/Copy.svg";
-import Icon from "./IconButton";
+import Icon from "./UI/IconButton";
 import { useContext, useEffect } from "react";
 import { AppContext } from "../state/translate_app_context";
 import { fetchTranslation } from "../utils/fetch_translation";
 import { languageDetect } from "../utils/detect_lang";
 
-export default function FooterSection({ roll }) {
+export default function FooterSection({ input = false }) {
   const { inputLang, outputLang, inputedText, updateTranslationInfo, updateLang } =
     useContext(AppContext);
   
@@ -29,17 +29,17 @@ export default function FooterSection({ roll }) {
     const translatedText = await fetchTranslation(encodedText, language, outputLang);
 
     updateTranslationInfo(translatedText, true);
-    if (inputLang !== language) updateLang(language, 'input');
+    if (inputLang !== language) updateLang(language, 'input'); //in detec language mode...
   }
 
   return (
     <div className="features">
       <div className="icons">
-        <Icon roll={roll} name='hear' route={hear} title="Listen text" />
-        <Icon roll={roll} name='copy' route={copy} title="Copy text" />
+        <Icon name='hear' route={hear} title="Listen text" input={input} />
+        <Icon name='copy' route={copy} title="Copy text" input={input} />
       </div>
 
-      {roll === "input" && (
+      {input && (
         <div
           title="translate"
           className="translate--btn"
